@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 try:
     # Load the audio file
     print("Loading audio file...")
-    input_file = "new.wav"
+    input_file = "blue-highway-[AudioTrimmer.com].wav"
     audio_data, sample_rate = sf.read(input_file)
     print(f"Audio data shape: {audio_data.shape}, Sample rate: {sample_rate}")
 
@@ -45,6 +45,19 @@ try:
     print("Extracting noise profile...")
     noise_clip = audio_data[:min(len(audio_data), sample_rate)]
 
+    # Plot noise profile frequency spectrum
+    print("Plotting noise profile frequency spectrum...")
+    fft_noise = np.abs(np.fft.rfft(noise_clip))
+    plt.figure(figsize=(12, 4))
+    plt.plot(freq[:len(fft_noise)], fft_noise, label="Noise Profile Spectrum", color='red')
+    plt.title("Frequency Spectrum: Noise Profile")
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("Magnitude")
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+
     # Perform noise reduction
     print("Reducing noise...")
     reduced_noise = nr.reduce_noise(
@@ -60,7 +73,7 @@ try:
     sf.write(output_file, reduced_noise, sample_rate)
 
     # Plot reduced waveform
-    print("Plotting noise-reduced audio...")
+    print("Plotting noise-reduced audio waveform...")
     plt.figure(figsize=(12, 4))
     plt.plot(time, reduced_noise, label="Noise-Reduced Audio", color='orange')
     plt.title("Waveform: Noise-Reduced Audio")
@@ -76,6 +89,18 @@ try:
     plt.figure(figsize=(12, 4))
     plt.plot(freq, fft_reduced, label="Noise-Reduced Audio Spectrum", color='orange')
     plt.title("Frequency Spectrum: Noise-Reduced Audio")
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("Magnitude")
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+    # Overlay original and noise-reduced spectra
+    print("Overlaying original and noise-reduced spectra...")
+    plt.figure(figsize=(12, 4))
+    plt.plot(freq, fft_original, label="Original Audio Spectrum", alpha=0.7)
+    plt.plot(freq, fft_reduced, label="Noise-Reduced Audio Spectrum", color='orange', alpha=0.7)
+    plt.title("Comparison: Frequency Spectrum (Original vs Noise-Reduced)")
     plt.xlabel("Frequency (Hz)")
     plt.ylabel("Magnitude")
     plt.legend()
